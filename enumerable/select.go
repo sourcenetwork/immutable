@@ -25,7 +25,11 @@ func (s *enumerableSelect[TSource, TResult]) Next() (bool, error) {
 		return hasNext, err
 	}
 
-	value := s.source.Value()
+	value, err := s.source.Value()
+	if err != nil {
+		return false, nil
+	}
+
 	// We do this here to keep the work (and errors) in the `Next` call
 	result, err := s.selector(value)
 	if err != nil {
@@ -36,8 +40,8 @@ func (s *enumerableSelect[TSource, TResult]) Next() (bool, error) {
 	return true, nil
 }
 
-func (s *enumerableSelect[TSource, TResult]) Value() TResult {
-	return s.currentValue
+func (s *enumerableSelect[TSource, TResult]) Value() (TResult, error) {
+	return s.currentValue, nil
 }
 
 func (s *enumerableSelect[TSource, TResult]) Reset() {

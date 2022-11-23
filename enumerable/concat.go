@@ -34,7 +34,7 @@ func (s *enumerableConcat[T]) Next() (bool, error) {
 	}
 }
 
-func (s *enumerableConcat[T]) Value() T {
+func (s *enumerableConcat[T]) Value() (T, error) {
 	return s.sources[s.currentSourceIndex].Value()
 }
 
