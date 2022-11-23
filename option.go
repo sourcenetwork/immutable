@@ -1,4 +1,4 @@
-package immutables
+package immutable
 
 // Option represents an item that may or may not have a value.
 type Option[T any] struct {

@@ -1,4 +1,4 @@
 /*
-Package immutables provides immutable types.
+Package immutable provides immutable types.
 */
-package immutables
+package immutable
