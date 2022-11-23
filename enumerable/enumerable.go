@@ -20,7 +20,7 @@ type Enumerable[T any] interface {
 	//
 	// If the previous Next call did not return true, or Next has never been called
 	// the behaviour and return value of this function is undefined.
-	Value() T
+	Value() (T, error)
 
 	// Reset resets the enumerable, allowing for re-iteration.
 	Reset()
@@ -49,8 +49,8 @@ func (s *enumerableSlice[T]) Next() (bool, error) {
 	return true, nil
 }
 
-func (s *enumerableSlice[T]) Value() T {
-	return s.source[s.currentIndex]
+func (s *enumerableSlice[T]) Value() (T, error) {
+	return s.source[s.currentIndex], nil
 }
 
 func (s *enumerableSlice[T]) Reset() {
@@ -68,7 +68,10 @@ func ForEach[T any](source Enumerable[T], action func(item T)) error {
 		if !hasNext {
 			break
 		}
-		item := source.Value()
+		item, err := source.Value()
+		if err != nil {
+			return err
+		}
 		action(item)
 	}
 	source.Reset()
@@ -101,5 +104,11 @@ func TryGetFirst[T any](source Enumerable[T]) (T, bool, error) {
 		var defaultV T
 		return defaultV, false, err
 	}
-	return source.Value(), true, nil
+
+	val, err := source.Value()
+	if err != nil {
+		var defaultV T
+		return defaultV, false, err
+	}
+	return val, true, nil
 }

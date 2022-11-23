@@ -28,7 +28,7 @@ func (s *enumerableSkip[T]) Next() (bool, error) {
 	return s.source.Next()
 }
 
-func (s *enumerableSkip[T]) Value() T {
+func (s *enumerableSkip[T]) Value() (T, error) {
 	return s.source.Value()
 }
 

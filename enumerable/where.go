@@ -22,14 +22,18 @@ func (s *enumerableWhere[T]) Next() (bool, error) {
 			return hasNext, err
 		}
 
-		value := s.source.Value()
+		value, err := s.source.Value()
+		if err != nil {
+			return false, err
+		}
+
 		if passes, err := s.predicate(value); passes || err != nil {
 			return passes, err
 		}
 	}
 }
 
-func (s *enumerableWhere[T]) Value() T {
+func (s *enumerableWhere[T]) Value() (T, error) {
 	return s.source.Value()
 }
 

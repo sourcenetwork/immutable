@@ -23,7 +23,7 @@ func (s *enumerableTake[T]) Next() (bool, error) {
 	return s.source.Next()
 }
 
-func (s *enumerableTake[T]) Value() T {
+func (s *enumerableTake[T]) Value() (T, error) {
 	return s.source.Value()
 }
 
