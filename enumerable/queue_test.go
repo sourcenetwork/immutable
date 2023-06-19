@@ -183,7 +183,7 @@ func TestQueueYieldsItemCorrectlyGivenCircle(t *testing.T) {
 	require.True(t, hasNext)
 
 	r1, err := queue.Value()
-	// [, 2, 3]
+	// [1, 2, 3]
 	require.NoError(t, err)
 	require.Equal(t, v1, r1)
 
@@ -192,19 +192,19 @@ func TestQueueYieldsItemCorrectlyGivenCircle(t *testing.T) {
 	require.True(t, hasNext)
 
 	r2, err := queue.Value()
-	// [, , 3]
+	// [, 2, 3]
 	require.NoError(t, err)
 	require.Equal(t, v2, r2)
 
 	queue.Put(v4)
-	// [4, , 3]
+	// [4, 2, 3]
 
 	hasNext, err = queue.Next()
 	require.NoError(t, err)
 	require.True(t, hasNext)
 
 	r3, err := queue.Value()
-	// [4, ,]
+	// [4, , 3]
 	require.NoError(t, err)
 	require.Equal(t, v3, r3)
 
@@ -213,7 +213,7 @@ func TestQueueYieldsItemCorrectlyGivenCircle(t *testing.T) {
 	require.True(t, hasNext)
 
 	r4, err := queue.Value()
-	// [, ,]
+	// [4, ,]
 	require.NoError(t, err)
 	require.Equal(t, v4, r4)
 
@@ -223,6 +223,87 @@ func TestQueueYieldsItemCorrectlyGivenCircle(t *testing.T) {
 
 	size := queue.Size()
 	require.Equal(t, 3, size)
+}
+
+func TestQueuePutsItemCorrectlyGivenCircle(t *testing.T) {
+	v1 := 1
+	v2 := 2
+	v3 := 3
+	v4 := 4
+	v5 := 5
+	v6 := 6
+	queue := NewQueue[int]()
+
+	queue.Put(v1)
+	queue.Put(v2)
+	queue.Put(v3)
+	// [1, 2, 3]
+
+	hasNext, err := queue.Next()
+	require.NoError(t, err)
+	require.True(t, hasNext)
+
+	r1, err := queue.Value()
+	// [1, 2, 3]
+	require.NoError(t, err)
+	require.Equal(t, v1, r1)
+
+	hasNext, err = queue.Next()
+	require.NoError(t, err)
+	require.True(t, hasNext)
+
+	r2, err := queue.Value()
+	// [, 2, 3]
+	require.NoError(t, err)
+	require.Equal(t, v2, r2)
+
+	queue.Put(v4)
+	queue.Put(v5)
+	queue.Put(v6)
+	// [4, 5, 6, 2, 3]
+
+	hasNext, err = queue.Next()
+	require.NoError(t, err)
+	require.True(t, hasNext)
+
+	r3, err := queue.Value()
+	// [4, 5, 6, , 3]
+	require.NoError(t, err)
+	require.Equal(t, v3, r3)
+
+	hasNext, err = queue.Next()
+	require.NoError(t, err)
+	require.True(t, hasNext)
+
+	r4, err := queue.Value()
+	// [, 5, 6, , 3]
+	require.NoError(t, err)
+	require.Equal(t, v4, r4)
+
+	hasNext, err = queue.Next()
+	require.NoError(t, err)
+	require.True(t, hasNext)
+
+	r5, err := queue.Value()
+	// [, 5, 6, , ]
+	require.NoError(t, err)
+	require.Equal(t, v5, r5)
+
+	hasNext, err = queue.Next()
+	require.NoError(t, err)
+	require.True(t, hasNext)
+
+	r6, err := queue.Value()
+	// [, , 6, , ]
+	require.NoError(t, err)
+	require.Equal(t, v6, r6)
+
+	hasNext, err = queue.Next()
+	require.NoError(t, err)
+	require.False(t, hasNext)
+
+	size := queue.Size()
+	require.Equal(t, 5, size)
 }
 
 func TestQueueYieldsItemAddedAfterFullEnumeration(t *testing.T) {
@@ -257,4 +338,27 @@ func TestQueueYieldsItemAddedAfterFullEnumeration(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, v3, r3)
+}
+
+func TestQueueReturnsFalseAfterYieldingItemAddedAfterInitialEnumerations(t *testing.T) {
+	v1 := 1
+	queue := NewQueue[int]()
+
+	hasNext, err := queue.Next()
+	require.NoError(t, err)
+	require.False(t, hasNext)
+
+	queue.Put(v1)
+
+	hasNext, err = queue.Next()
+	require.NoError(t, err)
+	require.True(t, hasNext)
+
+	hasNext, err = queue.Next()
+	require.NoError(t, err)
+	require.False(t, hasNext)
+
+	hasNext, err = queue.Next()
+	require.NoError(t, err)
+	require.False(t, hasNext)
 }
