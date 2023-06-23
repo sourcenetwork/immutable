@@ -39,6 +39,9 @@ func (s *enumerableConcat[T]) Next() (bool, error) {
 	hasLooped := false
 
 	for {
+		// If we have reached the end of the sources slice we need to loop
+		// back to the beginning.  It may be that earlier sources have gained
+		// items whilst we iterated though later sources.
 		if s.currentSourceIndex >= len(s.sources) {
 			if len(s.sources) < 1 || hasLooped {
 				return false, nil
@@ -59,6 +62,9 @@ func (s *enumerableConcat[T]) Next() (bool, error) {
 		s.currentSourceIndex += 1
 
 		if s.currentSourceIndex == startSourceIndex {
+			// If we are here it means that we have re-cycled
+			// all the way through the source slice and have found
+			// no new items.
 			return false, nil
 		}
 	}
