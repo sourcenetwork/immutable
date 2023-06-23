@@ -19,7 +19,7 @@ type Queue[T any] interface {
 // For now, increasing the size one at a time is likely optimal
 // for the only useage of the queue type.  We may wish to change
 // this at somepoint however.
-const growthRate int = 1
+const growthSize int = 1
 
 type queue[T any] struct {
 	values          []T
@@ -47,12 +47,12 @@ func (q *queue[T]) Put(value T) error {
 
 	if index >= len(q.values) {
 		if len(q.values) == 0 {
-			q.values = make([]T, growthRate)
+			q.values = make([]T, growthSize)
 			q.currentIndex = -1
 		} else if q.zeroIndexSet {
 			// If the zero index is occupied, we cannot loop back to it here
 			// and instead need to grow the values slice.
-			newValues := make([]T, len(q.values)+growthRate)
+			newValues := make([]T, len(q.values)+growthSize)
 			copy(newValues, q.values[:index])
 			q.values = newValues
 		} else {
@@ -67,12 +67,12 @@ func (q *queue[T]) Put(value T) error {
 		// e.g: [3,4,here,1,2]
 		// Note: The last value read should not be overwritten, as `Value`
 		// may be called multiple times on it after a single `Next` call.
-		newValues := make([]T, len(q.values)+growthRate)
+		newValues := make([]T, len(q.values)+growthSize)
 		copy(newValues, q.values[:index])
-		copy(newValues[index+growthRate:], q.values[index:])
+		copy(newValues[index+growthSize:], q.values[index:])
 		q.values = newValues
 		// Shift the current read index to reflect its new location.
-		q.currentIndex += growthRate
+		q.currentIndex += growthSize
 	}
 
 	if index == 0 {
