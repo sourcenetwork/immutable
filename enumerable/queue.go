@@ -22,10 +22,23 @@ type Queue[T any] interface {
 const growthSize int = 1
 
 type queue[T any] struct {
-	values          []T
-	currentIndex    int
-	lastSetIndex    int
-	zeroIndexSet    bool
+	// The values slice of this queue.
+	//
+	// Note: queue is implementated as a dynamically sized ring buffer, the zero index
+	// is not nessecarily the next/current value. Also note that values are not explicitly
+	// removed from this slice, which values are still 'in' the queue is tracked by index.
+	values []T
+
+	// The index of the current value.
+	currentIndex int
+
+	// The index of the last value added to the queue.
+	lastSetIndex int
+
+	// Will be true if values[0] has been set.
+	zeroIndexSet bool
+
+	// Will be true a value has been attempted to be read from an empty queue.
 	waitingForWrite bool
 }
 
